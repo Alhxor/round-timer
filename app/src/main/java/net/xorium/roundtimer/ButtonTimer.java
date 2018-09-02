@@ -3,6 +3,7 @@ package net.xorium.roundtimer;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.CountDownTimer;
+import android.view.View;
 import android.widget.Button;
 
 import java.sql.Time;
@@ -16,7 +17,22 @@ public class ButtonTimer extends CountDownTimer {
     private MediaPlayer beep;
     private static final long TICK = 10; // ms
 
-    ButtonTimer(Context context, Button b, long startTime) {
+    /* Turns a button into a button with timer */
+    public static void add(Context context, Button b, long duration) {
+        final ButtonTimer bt = new ButtonTimer(context, b, duration);
+
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (bt.isClicked())
+                    bt.stop();
+                else
+                    bt.click();
+            }
+        });
+    }
+
+    private ButtonTimer(Context context, Button b, long startTime) {
         super(startTime, TICK);
 
         clicked = false;
@@ -26,13 +42,13 @@ public class ButtonTimer extends CountDownTimer {
         beep = MediaPlayer.create(context, R.raw.beep);
     }
 
-    public void click() {
+    private void click() {
         super.start();
         beep.start();
         clicked = true;
     }
 
-    public void stop() {
+    private void stop() {
         super.cancel();
         clicked = false;
         btn.setText(btnDefaultText);
@@ -51,7 +67,7 @@ public class ButtonTimer extends CountDownTimer {
         btn.setText(time.toString().substring(3) + "." + ms.toString());
     }
 
-    public Boolean isClicked() {
+    private Boolean isClicked() {
         return clicked;
     }
 }
